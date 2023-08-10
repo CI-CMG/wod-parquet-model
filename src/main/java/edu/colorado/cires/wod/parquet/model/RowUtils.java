@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.spark.sql.Row;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 final class RowUtils {
 
@@ -20,14 +22,14 @@ final class RowUtils {
   }
 
   static <T> List<List<T>> getAsList(Row row, String field, Function<Row, T> transform) {
-    List<List<Row>> listList = row.getList(row.fieldIndex(field));
+    List<Seq<Row>> listList = row.getList(row.fieldIndex(field));
     if(listList == null) {
       return null;
     }
     List<List<T>> typedListList = new ArrayList<>();
-    for (List<Row> list : listList) {
+    for (Seq<Row> seq : listList) {
       List<T> innerList = new ArrayList<>();
-      for (Row r : list) {
+      for (Row r : JavaConverters.asJava(seq)) {
         innerList.add(transform.apply(r));
       }
       typedListList.add(innerList);
