@@ -35,8 +35,7 @@ public class Cast implements Serializable {
         new StructField("attributes", DataTypes.createArrayType(Attribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("biologicalAttributes", DataTypes.createArrayType(Attribute.structType()), false,
             org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("taxonomicDatasets", DataTypes.createArrayType(DataTypes.createArrayType(QcAttribute.structType())), false,
-            org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("taxonomicDatasets", DataTypes.createArrayType(QcAttribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("depths", DataTypes.createArrayType(Depth.structType()), false, org.apache.spark.sql.types.Metadata.empty())
     });
   }
@@ -81,7 +80,7 @@ public class Cast implements Serializable {
   private List<PrincipalInvestigator> principalInvestigators;
   private List<Attribute> attributes;
   private List<Attribute> biologicalAttributes;
-  private List<List<QcAttribute>> taxonomicDatasets;
+  private List<TaxonomicDataset> taxonomicDatasets;
   private List<Depth> depths;
 
   @Deprecated
@@ -90,7 +89,7 @@ public class Cast implements Serializable {
 
   private Cast(String dataset, int castNumber, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
       int profileType, String originatorsStationCode, String geohash, List<Variable> variables, List<PrincipalInvestigator> principalInvestigators,
-      List<Attribute> attributes, List<Attribute> biologicalAttributes, List<List<QcAttribute>> taxonomicDatasets, List<Depth> depths) {
+      List<Attribute> attributes, List<Attribute> biologicalAttributes, List<TaxonomicDataset> taxonomicDatasets, List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
     this.timestamp = timestamp;
@@ -267,12 +266,12 @@ public class Cast implements Serializable {
     this.biologicalAttributes = new ArrayList<>(biologicalAttributes);
   }
 
-  public List<List<QcAttribute>> getTaxonomicDatasets() {
+  public List<TaxonomicDataset> getTaxonomicDatasets() {
     return taxonomicDatasets;
   }
 
   @Deprecated
-  public void setTaxonomicDatasets(List<List<QcAttribute>> taxonomicDatasets) {
+  public void setTaxonomicDatasets(List<TaxonomicDataset> taxonomicDatasets) {
     if (taxonomicDatasets == null) {
       taxonomicDatasets = new ArrayList<>(0);
     }
@@ -369,7 +368,7 @@ public class Cast implements Serializable {
     private List<PrincipalInvestigator> principalInvestigators = new ArrayList<>(0);
     private List<Attribute> attributes = new ArrayList<>(0);
     private List<Attribute> biologicalAttributes = new ArrayList<>(0);
-    private List<List<QcAttribute>> taxonomicDatasets = new ArrayList<>(0);
+    private List<TaxonomicDataset> taxonomicDatasets = new ArrayList<>(0);
     private List<Depth> depths = new ArrayList<>(0);
 
     private Builder() {
@@ -413,7 +412,7 @@ public class Cast implements Serializable {
       principalInvestigators = RowUtils.getAs(row, "principalInvestigators", r -> PrincipalInvestigator.builder(r).build());
       attributes = RowUtils.getAs(row, "attributes", r -> Attribute.builder(r).build());
       biologicalAttributes = RowUtils.getAs(row, "biologicalAttributes", r -> Attribute.builder(r).build());
-      taxonomicDatasets = RowUtils.getAsList(row, "taxonomicDatasets", r -> QcAttribute.builder(r).build());
+      taxonomicDatasets = RowUtils.getAs(row, "taxonomicDatasets", r -> TaxonomicDataset.builder(r).build());
       depths = RowUtils.getAs(row, "depths", r -> Depth.builder(r).build());
     }
 
@@ -497,7 +496,7 @@ public class Cast implements Serializable {
       return this;
     }
 
-    public Builder withTaxonomicDatasets(List<List<QcAttribute>> taxonomicDatasets) {
+    public Builder withTaxonomicDatasets(List<TaxonomicDataset> taxonomicDatasets) {
       this.taxonomicDatasets = taxonomicDatasets == null ? new ArrayList<>(0) : new ArrayList<>(taxonomicDatasets);
       return this;
     }
