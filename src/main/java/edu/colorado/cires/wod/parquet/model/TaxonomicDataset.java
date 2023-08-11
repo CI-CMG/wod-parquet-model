@@ -16,7 +16,7 @@ public class TaxonomicDataset implements Serializable {
 
   public static StructType structType() {
     return new StructType(new StructField[]{
-        new StructField("attributes", DataTypes.createArrayType(QcAttribute.structType()), true, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("attributes", DataTypes.createArrayType(QcAttribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
     });
   }
 
@@ -39,9 +39,8 @@ public class TaxonomicDataset implements Serializable {
   }
 
   @Deprecated
-  public TaxonomicDataset setAttributes(List<QcAttribute> attributes) {
+  public void setAttributes(List<QcAttribute> attributes) {
     this.attributes = attributes == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(attributes));
-    return this;
   }
 
   @Override

@@ -35,7 +35,7 @@ public class Cast implements Serializable {
         new StructField("attributes", DataTypes.createArrayType(Attribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("biologicalAttributes", DataTypes.createArrayType(Attribute.structType()), false,
             org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("taxonomicDatasets", DataTypes.createArrayType(QcAttribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("taxonomicDatasets", DataTypes.createArrayType(TaxonomicDataset.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("depths", DataTypes.createArrayType(Depth.structType()), false, org.apache.spark.sql.types.Metadata.empty())
     });
   }
@@ -305,13 +305,16 @@ public class Cast implements Serializable {
         && Objects.equals(originatorsStationCode, cast.originatorsStationCode) && Objects.equals(geohash, cast.geohash)
         && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators, cast.principalInvestigators)
         && Objects.equals(attributes, cast.attributes) && Objects.equals(biologicalAttributes, cast.biologicalAttributes)
-        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths, cast.depths);
+        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets)
+        && Objects.equals(depths, cast.depths);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(dataset, castNumber, timestamp, year, month, day, time, longitude, latitude, profileType, originatorsStationCode, geohash,
-        variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
+        variables, principalInvestigators, attributes, biologicalAttributes,
+        taxonomicDatasets,
+        depths);
   }
 
   @Override
