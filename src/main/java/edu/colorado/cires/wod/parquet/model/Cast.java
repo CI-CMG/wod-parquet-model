@@ -19,6 +19,8 @@ public class Cast implements Serializable {
     return new StructType(new StructField[]{
         new StructField("dataset", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("castNumber", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("cruiseNumber", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("originatorsCruise", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("timestamp", DataTypes.LongType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("year", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("month", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
@@ -44,6 +46,8 @@ public class Cast implements Serializable {
     return new GenericRowWithSchema(new Object[]{
         dataset,
         castNumber,
+        cruiseNumber,
+        originatorsCruise,
         timestamp,
         year,
         month,
@@ -66,6 +70,8 @@ public class Cast implements Serializable {
 
   private String dataset;
   private int castNumber;
+  private Integer cruiseNumber;
+  private String originatorsCruise;
   private long timestamp;
   private int year;
   private int month;
@@ -87,11 +93,13 @@ public class Cast implements Serializable {
   public Cast() {
   }
 
-  private Cast(String dataset, int castNumber, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
+  private Cast(String dataset, int castNumber, Integer cruiseNumber, String originatorsCruise, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
       int profileType, String originatorsStationCode, String geohash, List<Variable> variables, List<PrincipalInvestigator> principalInvestigators,
       List<Attribute> attributes, List<Attribute> biologicalAttributes, List<TaxonomicDataset> taxonomicDatasets, List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
+    this.cruiseNumber = cruiseNumber;
+    this.originatorsCruise = originatorsCruise;
     this.timestamp = timestamp;
     this.year = year;
     this.month = month;
@@ -126,6 +134,24 @@ public class Cast implements Serializable {
   @Deprecated
   public void setCastNumber(int castNumber) {
     this.castNumber = castNumber;
+  }
+
+  public Integer getCruiseNumber() {
+    return cruiseNumber;
+  }
+
+  @Deprecated
+  public void setCruiseNumber(Integer cruiseNumber) {
+    this.cruiseNumber = cruiseNumber;
+  }
+
+  public String getOriginatorsCruise() {
+    return originatorsCruise;
+  }
+
+  @Deprecated
+  public void setOriginatorsCruise(String originatorsCruise) {
+    this.originatorsCruise = originatorsCruise;
   }
 
   public long getTimestamp() {
@@ -302,19 +328,17 @@ public class Cast implements Serializable {
     return castNumber == cast.castNumber && timestamp == cast.timestamp && year == cast.year && month == cast.month && day == cast.day
         && Double.compare(cast.time, time) == 0 && Double.compare(cast.longitude, longitude) == 0
         && Double.compare(cast.latitude, latitude) == 0 && profileType == cast.profileType && Objects.equals(dataset, cast.dataset)
+        && Objects.equals(cruiseNumber, cast.cruiseNumber) && Objects.equals(originatorsCruise, cast.originatorsCruise)
         && Objects.equals(originatorsStationCode, cast.originatorsStationCode) && Objects.equals(geohash, cast.geohash)
         && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators, cast.principalInvestigators)
         && Objects.equals(attributes, cast.attributes) && Objects.equals(biologicalAttributes, cast.biologicalAttributes)
-        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets)
-        && Objects.equals(depths, cast.depths);
+        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths, cast.depths);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(dataset, castNumber, timestamp, year, month, day, time, longitude, latitude, profileType, originatorsStationCode, geohash,
-        variables, principalInvestigators, attributes, biologicalAttributes,
-        taxonomicDatasets,
-        depths);
+    return Objects.hash(dataset, castNumber, cruiseNumber, originatorsCruise, timestamp, year, month, day, time, longitude, latitude, profileType,
+        originatorsStationCode, geohash, variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
   }
 
   @Override
@@ -322,6 +346,8 @@ public class Cast implements Serializable {
     return "Cast{" +
         "dataset='" + dataset + '\'' +
         ", castNumber=" + castNumber +
+        ", cruiseNumber=" + cruiseNumber +
+        ", originatorsCruise='" + originatorsCruise + '\'' +
         ", timestamp=" + timestamp +
         ", year=" + year +
         ", month=" + month +
@@ -357,6 +383,8 @@ public class Cast implements Serializable {
 
     private String dataset;
     private int castNumber;
+    private Integer cruiseNumber;
+    private String originatorsCruise;
     private long timestamp;
     private int year;
     private int month;
@@ -380,6 +408,8 @@ public class Cast implements Serializable {
     private Builder(Cast source) {
       dataset = source.getDataset();
       castNumber = source.getCastNumber();
+      cruiseNumber = source.getCruiseNumber();
+      originatorsCruise = source.getOriginatorsCruise();
       timestamp = source.getTimestamp();
       year = source.getYear();
       month = source.getMonth();
@@ -401,6 +431,8 @@ public class Cast implements Serializable {
     private Builder(Row row) {
       dataset = row.getAs("dataset");
       castNumber = row.getAs("castNumber");
+      cruiseNumber = row.getAs("cruiseNumber");
+      originatorsCruise = row.getAs("originatorsCruise");
       timestamp = row.getAs("timestamp");
       year = row.getAs("year");
       month = row.getAs("month");
@@ -426,6 +458,16 @@ public class Cast implements Serializable {
 
     public Builder withCastNumber(int castNumber) {
       this.castNumber = castNumber;
+      return this;
+    }
+
+    public Builder withCruiseNumber(Integer cruiseNumber) {
+      this.cruiseNumber = cruiseNumber;
+      return this;
+    }
+
+    public Builder withOriginatorsCruise(String originatorsCruise) {
+      this.originatorsCruise = originatorsCruise;
       return this;
     }
 
@@ -513,6 +555,8 @@ public class Cast implements Serializable {
       return new Cast(
           dataset,
           castNumber,
+          cruiseNumber,
+          originatorsCruise,
           timestamp,
           year,
           month,
