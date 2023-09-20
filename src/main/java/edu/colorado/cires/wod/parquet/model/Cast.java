@@ -19,6 +19,7 @@ public class Cast implements Serializable {
     return new StructType(new StructField[]{
         new StructField("dataset", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("castNumber", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("country", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("cruiseNumber", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("originatorsCruise", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("timestamp", DataTypes.LongType, false, org.apache.spark.sql.types.Metadata.empty()),
@@ -46,6 +47,7 @@ public class Cast implements Serializable {
     return new GenericRowWithSchema(new Object[]{
         dataset,
         castNumber,
+        country,
         cruiseNumber,
         originatorsCruise,
         timestamp,
@@ -70,6 +72,7 @@ public class Cast implements Serializable {
 
   private String dataset;
   private int castNumber;
+  private String country;
   private Integer cruiseNumber;
   private String originatorsCruise;
   private long timestamp;
@@ -93,11 +96,12 @@ public class Cast implements Serializable {
   public Cast() {
   }
 
-  private Cast(String dataset, int castNumber, Integer cruiseNumber, String originatorsCruise, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
+  private Cast(String dataset, int castNumber, String country, Integer cruiseNumber, String originatorsCruise, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
       int profileType, String originatorsStationCode, String geohash, List<Variable> variables, List<PrincipalInvestigator> principalInvestigators,
       List<Attribute> attributes, List<Attribute> biologicalAttributes, List<TaxonomicDataset> taxonomicDatasets, List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
+    this.country = country;
     this.cruiseNumber = cruiseNumber;
     this.originatorsCruise = originatorsCruise;
     this.timestamp = timestamp;
@@ -134,6 +138,14 @@ public class Cast implements Serializable {
   @Deprecated
   public void setCastNumber(int castNumber) {
     this.castNumber = castNumber;
+  }
+
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
   }
 
   public Integer getCruiseNumber() {
@@ -332,12 +344,13 @@ public class Cast implements Serializable {
         && Objects.equals(originatorsStationCode, cast.originatorsStationCode) && Objects.equals(geohash, cast.geohash)
         && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators, cast.principalInvestigators)
         && Objects.equals(attributes, cast.attributes) && Objects.equals(biologicalAttributes, cast.biologicalAttributes)
-        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths, cast.depths);
+        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths, cast.depths)
+        && Objects.equals(country, cast.country);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(dataset, castNumber, cruiseNumber, originatorsCruise, timestamp, year, month, day, time, longitude, latitude, profileType,
+    return Objects.hash(dataset, castNumber, country, cruiseNumber, originatorsCruise, timestamp, year, month, day, time, longitude, latitude, profileType,
         originatorsStationCode, geohash, variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
   }
 
@@ -346,6 +359,7 @@ public class Cast implements Serializable {
     return "Cast{" +
         "dataset='" + dataset + '\'' +
         ", castNumber=" + castNumber +
+        ", country='" + country + '\'' +
         ", cruiseNumber=" + cruiseNumber +
         ", originatorsCruise='" + originatorsCruise + '\'' +
         ", timestamp=" + timestamp +
@@ -383,6 +397,7 @@ public class Cast implements Serializable {
 
     private String dataset;
     private int castNumber;
+    private String country;
     private Integer cruiseNumber;
     private String originatorsCruise;
     private long timestamp;
@@ -409,6 +424,7 @@ public class Cast implements Serializable {
       dataset = source.getDataset();
       castNumber = source.getCastNumber();
       cruiseNumber = source.getCruiseNumber();
+      country = source.getCountry();
       originatorsCruise = source.getOriginatorsCruise();
       timestamp = source.getTimestamp();
       year = source.getYear();
@@ -432,6 +448,7 @@ public class Cast implements Serializable {
       dataset = row.getAs("dataset");
       castNumber = row.getAs("castNumber");
       cruiseNumber = row.getAs("cruiseNumber");
+      country = row.getAs("country");
       originatorsCruise = row.getAs("originatorsCruise");
       timestamp = row.getAs("timestamp");
       year = row.getAs("year");
@@ -466,6 +483,10 @@ public class Cast implements Serializable {
       return this;
     }
 
+    public  Builder withCountry(String country){
+      this.country = country;
+      return this;
+    }
     public Builder withOriginatorsCruise(String originatorsCruise) {
       this.originatorsCruise = originatorsCruise;
       return this;
@@ -555,6 +576,7 @@ public class Cast implements Serializable {
       return new Cast(
           dataset,
           castNumber,
+          country,
           cruiseNumber,
           originatorsCruise,
           timestamp,
