@@ -10,7 +10,7 @@ Add the following dependency to your Maven pom.xml
 
 ```xml
     <dependency>
-      <groupId>io.github.ci-cmg</groupId>
+      <groupId>io.github.ci-cmg.wod</groupId>
       <artifactId>wod-parquet-model</artifactId>
       <version>0.0.1</version>
     </dependency>
