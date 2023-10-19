@@ -71,7 +71,6 @@ public class Cast implements Serializable {
   }
 
 
-  @Nonnull
   private String dataset;
   private int castNumber;
   private String country;
@@ -124,6 +123,7 @@ public class Cast implements Serializable {
     this.depths = Collections.unmodifiableList(depths);
   }
 
+  @Nonnull
   public String getDataset() {
     return dataset;
   }
