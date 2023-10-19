@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.DataTypes;
@@ -19,7 +20,7 @@ public class Variable implements Serializable {
   public static StructType structType() {
     return new StructType(new StructField[]{
         new StructField("code", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("metadata", DataTypes.createArrayType(Metadata.structType()), false, org.apache.spark.sql.types.Metadata.empty())
+        new StructField("metadata", DataTypes.createArrayType(Metadata.structType(), false), false, org.apache.spark.sql.types.Metadata.empty())
     });
   }
 
@@ -61,6 +62,7 @@ public class Variable implements Serializable {
     this.code = code;
   }
 
+  @Nonnull
   public List<Metadata> getMetadata() {
     return metadata;
   }

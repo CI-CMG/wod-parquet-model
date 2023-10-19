@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.DataTypes;
@@ -16,7 +17,7 @@ public class TaxonomicDataset implements Serializable {
 
   public static StructType structType() {
     return new StructType(new StructField[]{
-        new StructField("attributes", DataTypes.createArrayType(QcAttribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("attributes", DataTypes.createArrayType(QcAttribute.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
     });
   }
 
@@ -34,6 +35,7 @@ public class TaxonomicDataset implements Serializable {
     this.attributes = Collections.unmodifiableList(attributes);
   }
 
+  @Nonnull
   public List<QcAttribute> getAttributes() {
     return attributes;
   }

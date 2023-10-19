@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.DataTypes;
@@ -20,7 +21,7 @@ public class Depth implements Serializable {
         new StructField("depth", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("depthErrorFlag", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("originatorsFlag", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("data", DataTypes.createArrayType(ProfileData.structType()), false, org.apache.spark.sql.types.Metadata.empty())
+        new StructField("data", DataTypes.createArrayType(ProfileData.structType(), false), false, org.apache.spark.sql.types.Metadata.empty())
     });
   }
 
@@ -37,7 +38,7 @@ public class Depth implements Serializable {
   public Depth() {
   }
 
-  private Depth(double depth, int depthErrorFlag, int originatorsFlag, List<ProfileData> data) {
+  private Depth(double depth, int depthErrorFlag, int originatorsFlag, @Nonnull List<ProfileData> data) {
     this.depth = depth;
     this.depthErrorFlag = depthErrorFlag;
     this.originatorsFlag = originatorsFlag;
@@ -71,6 +72,7 @@ public class Depth implements Serializable {
     this.originatorsFlag = originatorsFlag;
   }
 
+  @Nonnull
   public List<ProfileData> getData() {
     return data;
   }

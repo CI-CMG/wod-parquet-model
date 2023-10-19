@@ -33,14 +33,14 @@ public class Cast implements Serializable {
         new StructField("profileType", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("originatorsStationCode", DataTypes.StringType, true, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("geohash", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("variables", DataTypes.createArrayType(Variable.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("principalInvestigators", DataTypes.createArrayType(PrincipalInvestigator.structType()), false,
+        new StructField("variables", DataTypes.createArrayType(Variable.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("principalInvestigators", DataTypes.createArrayType(PrincipalInvestigator.structType(), false), false,
             org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("attributes", DataTypes.createArrayType(Attribute.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("biologicalAttributes", DataTypes.createArrayType(Attribute.structType()), false,
+        new StructField("attributes", DataTypes.createArrayType(Attribute.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("biologicalAttributes", DataTypes.createArrayType(Attribute.structType(), false), false,
             org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("taxonomicDatasets", DataTypes.createArrayType(TaxonomicDataset.structType()), false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("depths", DataTypes.createArrayType(Depth.structType()), false, org.apache.spark.sql.types.Metadata.empty())
+        new StructField("taxonomicDatasets", DataTypes.createArrayType(TaxonomicDataset.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("depths", DataTypes.createArrayType(Depth.structType(), false), false, org.apache.spark.sql.types.Metadata.empty())
     });
   }
 
@@ -97,9 +97,9 @@ public class Cast implements Serializable {
   public Cast() {
   }
 
-  private Cast(String dataset, int castNumber, String country, Integer cruiseNumber, String originatorsCruise, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
-      int profileType, String originatorsStationCode, String geohash, List<Variable> variables, List<PrincipalInvestigator> principalInvestigators,
-      List<Attribute> attributes, List<Attribute> biologicalAttributes, List<TaxonomicDataset> taxonomicDatasets, List<Depth> depths) {
+  private Cast(@Nonnull String dataset, int castNumber, String country, Integer cruiseNumber, String originatorsCruise, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
+      int profileType, String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
+      @Nonnull List<Attribute> attributes,  @Nonnull List<Attribute> biologicalAttributes,  @Nonnull List<TaxonomicDataset> taxonomicDatasets,  @Nonnull List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
     this.country = country;
@@ -123,7 +123,6 @@ public class Cast implements Serializable {
     this.depths = Collections.unmodifiableList(depths);
   }
 
-  @Nonnull
   public String getDataset() {
     return dataset;
   }
@@ -249,6 +248,7 @@ public class Cast implements Serializable {
     this.originatorsStationCode = originatorsStationCode;
   }
 
+  @Nonnull
   public String getGeohash() {
     return geohash;
   }
@@ -258,6 +258,7 @@ public class Cast implements Serializable {
     this.geohash = geohash;
   }
 
+  @Nonnull
   public List<Variable> getVariables() {
     return variables;
   }
@@ -270,6 +271,7 @@ public class Cast implements Serializable {
     this.variables = new ArrayList<>(variables);
   }
 
+  @Nonnull
   public List<PrincipalInvestigator> getPrincipalInvestigators() {
     return principalInvestigators;
   }
@@ -282,6 +284,7 @@ public class Cast implements Serializable {
     this.principalInvestigators = new ArrayList<>(principalInvestigators);
   }
 
+  @Nonnull
   public List<Attribute> getAttributes() {
     return attributes;
   }
@@ -294,6 +297,7 @@ public class Cast implements Serializable {
     this.attributes = new ArrayList<>(attributes);
   }
 
+  @Nonnull
   public List<Attribute> getBiologicalAttributes() {
     return biologicalAttributes;
   }
@@ -306,6 +310,7 @@ public class Cast implements Serializable {
     this.biologicalAttributes = new ArrayList<>(biologicalAttributes);
   }
 
+  @Nonnull
   public List<TaxonomicDataset> getTaxonomicDatasets() {
     return taxonomicDatasets;
   }
@@ -318,6 +323,7 @@ public class Cast implements Serializable {
     this.taxonomicDatasets = taxonomicDatasets;
   }
 
+  @Nonnull
   public List<Depth> getDepths() {
     return depths;
   }
