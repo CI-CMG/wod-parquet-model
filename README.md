@@ -91,6 +91,7 @@ root
  |    |    |    |    |-- originatorsFlag: integer (nullable = false)
 ```
 
+TODO
 
 ## Java WOD Parquet Model
 
