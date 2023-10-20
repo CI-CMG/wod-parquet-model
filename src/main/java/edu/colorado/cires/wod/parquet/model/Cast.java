@@ -12,10 +12,20 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
+
+/**
+ * Parquet object model representing a WOD cast: A set of profiles (or a single profile) taken concurrently.
+ * This represents the root of the WOD Parquet schema.
+ */
 public class Cast implements Serializable {
 
   private static final long serialVersionUID = 0L;
 
+  /**
+   * Returns an Apache Spark {@link StructType} representing the root of the WOD Parquet schema.
+   *
+   * @return a {@link StructType} representing the root of the WOD Parquet schema
+   */
   public static StructType structType() {
     return new StructType(new StructField[]{
         new StructField("dataset", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
@@ -44,6 +54,11 @@ public class Cast implements Serializable {
     });
   }
 
+  /**
+   * This can be represented as a generic Spark {@link Row}
+   *
+   * @return this class represented as a generic Spark {@link Row}
+   */
   public Row asRow() {
     return new GenericRowWithSchema(new Object[]{
         dataset,
@@ -93,6 +108,13 @@ public class Cast implements Serializable {
   private List<TaxonomicDataset> taxonomicDatasets;
   private List<Depth> depths;
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public Cast() {
   }
@@ -123,146 +145,432 @@ public class Cast implements Serializable {
     this.depths = Collections.unmodifiableList(depths);
   }
 
+  /**
+   * Returns a WOD dataset: a data collection from similar instruments with similar resolution.
+   * Common Values:
+   * OSD - Ocean Station Data, Low-resolution CTD/XCTD, Plankton data
+   * CTD - High-resolution Conductivity-Temperature-Depth / XCTD data
+   * MBT - Mechanical / Digital / Micro Bathythermograph data
+   * XBT - Expendable Bathythermograph data
+   * SUR - Surface-only data
+   * APB - Autonomous Pinniped data
+   * MRB - Moored buoy data
+   * PFL - Profiling float data
+   * DRB - Drifting buoy data
+   * UOR - Undulating Oceanographic Recorder data
+   * GLD - Glider data
+   *
+   * @return usually a three-letter code representing a WOD dataset
+   */
+  @Nonnull
   public String getDataset() {
     return dataset;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setDataset(String dataset) {
     this.dataset = dataset;
   }
 
+  /**
+   * Each cast in the WOD18 is assigned a unique cast number.
+   *
+   * @return the unique identifier for this cast
+   */
   public int getCastNumber() {
     return castNumber;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setCastNumber(int castNumber) {
     this.castNumber = castNumber;
   }
 
+  /**
+   * A two-character code assigned to each country. Each code is unique to a country and is assigned by NCEI.
+   * Common Values:
+   * DE GERMANY
+   * DU EAST GERMANY
+   * AR ARGENTINA
+   * AU AUSTRALIA
+   * AT AUSTRIA
+   * BE BELGIUM
+   * BR BRAZIL
+   * BG BULGARIA
+   * CA CANADA
+   * CL CHILE
+   * TW TAIWAN
+   * CO COLOMBIA
+   * KR KOREA; REPUBLIC OF
+   * DK DENMARK
+   * EG EGYPT
+   * EC ECUADOR
+   * ES SPAIN
+   * US UNITED STATES
+   * FI FINLAND
+   * FR FRANCE
+   * GR GREECE
+   * IN INDIA
+   * ID INDONESIA
+   * IE IRELAND
+   * IS ICELAND
+   * IL ISRAEL
+   * IT ITALY
+   * JP JAPAN
+   * LB LEBANON
+   * LR LIBERIA
+   * MG MADAGASCAR
+   * MA MOROCCO
+   * MX MEXICO
+   * NO NORWAY
+   * NC NEW CALEDONIA
+   * NZ NEW ZEALAND
+   * PK PAKISTAN
+   * NL NETHERLANDS
+   * PE PERU
+   * PH PHILIPPINES
+   * PL POLAND
+   * PT PORTUGAL
+   * RO ROMANIA
+   * GB GREAT BRITAIN
+   * CN CHINA
+   * SE SWEDEN
+   * TH THAILAND
+   * TN TUNISIA
+   * TR TURKEY
+   * SU SOVIET UNION
+   * ZA SOUTH AFRICA
+   * UY URUGUAY
+   * VE VENEZUELA
+   * YU YUGOSLAVIA
+   * 99 UNKNOWN
+   * AG ANTIGUA
+   * DZ ALGERIA
+   * AO ANGOLA
+   * BB BARBADOS
+   * BS BAHAMAS
+   * CR COSTA RICA
+   * CU CUBA
+   * CY CYPRUS
+   * EE ESTONIA
+   * FJ FIJI
+   * GH GHANA
+   * HN HONDURAS
+   * HK HONG KONG
+   * CI COTE D'IVOIRE
+   * KW KUWAIT
+   * LV LATVIA
+   * LT LITHUANIA
+   * MU MAURITIUS
+   * MT MALTA
+   * MC MONACO
+   * MY MALAYSIA
+   * MR MAURITANIA
+   * NG NIGERIA
+   * PA PANAMA
+   * CD CONGO; THE DEMOCRATIC REPUBLIC OF THE
+   * RU RUSSIAN FEDERATION
+   * SA SAUDI ARABIA
+   * SC SEYCHELLES
+   * SN SENEGAL
+   * SG SINGAPORE
+   * SL SIERRA LEONE
+   * VC SAINT VINCENT AND THEN GRENADINES
+   * TO TONGA
+   * TT TRINIDAD AND TOBAGO
+   * UA UKRAINE
+   * WS SAMOA; WESTERN
+   * YE YEMEN
+   * ZZ MISCELLANEOUS ORGANIZATION
+   * MH MARSHALL ISLANDS
+   * HR CROATIA
+   * EU EUROPEAN UNION
+   *
+   * @return a two-character code representing a country
+   */
   public String getCountry() {
     return country;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
+  @Deprecated
   public void setCountry(String country) {
     this.country = country;
   }
 
+  /**
+   * @return
+   */
   public Integer getCruiseNumber() {
     return cruiseNumber;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setCruiseNumber(Integer cruiseNumber) {
     this.cruiseNumber = cruiseNumber;
   }
 
+  /**
+   *
+   * @return
+   */
   public String getOriginatorsCruise() {
     return originatorsCruise;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setOriginatorsCruise(String originatorsCruise) {
     this.originatorsCruise = originatorsCruise;
   }
 
+  /**
+   *
+   * @return
+   */
   public long getTimestamp() {
     return timestamp;
   }
 
+  /**
+   *
+   * @param timestamp
+   */
   @Deprecated
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
   }
 
+  /**
+   *
+   * @return
+   */
   public int getYear() {
     return year;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setYear(int year) {
     this.year = year;
   }
 
+  /**
+   *
+   * @return
+   */
   public int getMonth() {
     return month;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setMonth(int month) {
     this.month = month;
   }
 
+  /**
+   *
+   * @return
+   */
   public int getDay() {
     return day;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setDay(int day) {
     this.day = day;
   }
 
+  /**
+   *
+   * @return
+   */
   public double getTime() {
     return time;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setTime(double time) {
     this.time = time;
   }
 
+  /**
+   *
+   * @return
+   */
   public double getLongitude() {
     return longitude;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setLongitude(double longitude) {
     this.longitude = longitude;
   }
 
+  /**
+   *
+   * @return
+   */
   public double getLatitude() {
     return latitude;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setLatitude(double latitude) {
     this.latitude = latitude;
   }
 
+  /**
+   *
+   * @return
+   */
   public int getProfileType() {
     return profileType;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setProfileType(int profileType) {
     this.profileType = profileType;
   }
 
+  /**
+   *
+   * @return
+   */
   public String getOriginatorsStationCode() {
     return originatorsStationCode;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setOriginatorsStationCode(String originatorsStationCode) {
     this.originatorsStationCode = originatorsStationCode;
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public String getGeohash() {
     return geohash;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setGeohash(String geohash) {
     this.geohash = geohash;
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public List<Variable> getVariables() {
     return variables;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setVariables(List<Variable> variables) {
     if (variables == null) {
@@ -271,11 +579,22 @@ public class Cast implements Serializable {
     this.variables = new ArrayList<>(variables);
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public List<PrincipalInvestigator> getPrincipalInvestigators() {
     return principalInvestigators;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setPrincipalInvestigators(List<PrincipalInvestigator> principalInvestigators) {
     if (principalInvestigators == null) {
@@ -284,11 +603,22 @@ public class Cast implements Serializable {
     this.principalInvestigators = new ArrayList<>(principalInvestigators);
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public List<Attribute> getAttributes() {
     return attributes;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setAttributes(List<Attribute> attributes) {
     if (attributes == null) {
@@ -297,11 +627,22 @@ public class Cast implements Serializable {
     this.attributes = new ArrayList<>(attributes);
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public List<Attribute> getBiologicalAttributes() {
     return biologicalAttributes;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setBiologicalAttributes(List<Attribute> biologicalAttributes) {
     if (biologicalAttributes == null) {
@@ -310,11 +651,22 @@ public class Cast implements Serializable {
     this.biologicalAttributes = new ArrayList<>(biologicalAttributes);
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public List<TaxonomicDataset> getTaxonomicDatasets() {
     return taxonomicDatasets;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setTaxonomicDatasets(List<TaxonomicDataset> taxonomicDatasets) {
     if (taxonomicDatasets == null) {
@@ -323,11 +675,22 @@ public class Cast implements Serializable {
     this.taxonomicDatasets = taxonomicDatasets;
   }
 
+  /**
+   *
+   * @return
+   */
   @Nonnull
   public List<Depth> getDepths() {
     return depths;
   }
 
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
   @Deprecated
   public void setDepths(List<Depth> depths) {
     if (depths == null) {
@@ -389,18 +752,35 @@ public class Cast implements Serializable {
         '}';
   }
 
+  /**
+   *
+   * @return
+   */
   public static Builder builder() {
     return new Builder();
   }
 
+  /**
+   *
+   * @param source
+   * @return
+   */
   public static Builder builder(Cast source) {
     return new Builder(source);
   }
 
+  /**
+   *
+   * @param row
+   * @return
+   */
   public static Builder builder(Row row) {
     return new Builder(row);
   }
 
+  /**
+   *
+   */
   public static class Builder {
 
     private String dataset;
@@ -476,110 +856,220 @@ public class Cast implements Serializable {
       depths = RowUtils.getAs(row, "depths", r -> Depth.builder(r).build());
     }
 
+    /**
+     *
+     * @param dataset
+     * @return
+     */
     public Builder withDataset(String dataset) {
       this.dataset = dataset;
       return this;
     }
 
+    /**
+     *
+     * @param castNumber
+     * @return
+     */
     public Builder withCastNumber(int castNumber) {
       this.castNumber = castNumber;
       return this;
     }
 
+    /**
+     *
+     * @param cruiseNumber
+     * @return
+     */
     public Builder withCruiseNumber(Integer cruiseNumber) {
       this.cruiseNumber = cruiseNumber;
       return this;
     }
 
+    /**
+     *
+     * @param country
+     * @return
+     */
     public  Builder withCountry(String country){
       this.country = country;
       return this;
     }
+
+    /**
+     *
+     * @param originatorsCruise
+     * @return
+     */
     public Builder withOriginatorsCruise(String originatorsCruise) {
       this.originatorsCruise = originatorsCruise;
       return this;
     }
 
+    /**
+     *
+     * @param timestamp
+     * @return
+     */
     public Builder withTimestamp(long timestamp) {
       this.timestamp = timestamp;
       return this;
     }
 
+    /**
+     *
+     * @param year
+     * @return
+     */
     public Builder withYear(int year) {
       this.year = year;
       return this;
     }
 
+    /**
+     *
+     * @param month
+     * @return
+     */
     public Builder withMonth(int month) {
       this.month = month;
       return this;
     }
 
+    /**
+     *
+     * @param day
+     * @return
+     */
     public Builder withDay(int day) {
       this.day = day;
       return this;
     }
 
+    /**
+     *
+     * @param time
+     * @return
+     */
     public Builder withTime(double time) {
       this.time = time;
       return this;
     }
 
+    /**
+     *
+     * @param longitude
+     * @return
+     */
     public Builder withLongitude(double longitude) {
       this.longitude = longitude;
       return this;
     }
 
+    /**
+     *
+     * @param latitude
+     * @return
+     */
     public Builder withLatitude(double latitude) {
       this.latitude = latitude;
       return this;
     }
 
+    /**
+     *
+     * @param profileType
+     * @return
+     */
     public Builder withProfileType(int profileType) {
       this.profileType = profileType;
       return this;
     }
 
+    /**
+     *
+     * @param originatorsStationCode
+     * @return
+     */
     public Builder withOriginatorsStationCode(String originatorsStationCode) {
       this.originatorsStationCode = originatorsStationCode;
       return this;
     }
 
+    /**
+     *
+     * @param geohash
+     * @return
+     */
     public Builder withGeohash(String geohash) {
       this.geohash = geohash;
       return this;
     }
 
+    /**
+     *
+     * @param variables
+     * @return
+     */
     public Builder withVariables(List<Variable> variables) {
       this.variables = variables == null ? new ArrayList<>(0) : new ArrayList<>(variables);
       return this;
     }
 
+    /**
+     *
+     * @param principalInvestigators
+     * @return
+     */
     public Builder withPrincipalInvestigators(List<PrincipalInvestigator> principalInvestigators) {
       this.principalInvestigators = principalInvestigators == null ? new ArrayList<>(0) : new ArrayList<>(principalInvestigators);
       return this;
     }
 
+    /**
+     *
+     * @param attributes
+     * @return
+     */
     public Builder withAttributes(List<Attribute> attributes) {
       this.attributes = attributes == null ? new ArrayList<>(0) : new ArrayList<>(attributes);
       return this;
     }
 
+    /**
+     *
+     * @param biologicalAttributes
+     * @return
+     */
     public Builder withBiologicalAttributes(List<Attribute> biologicalAttributes) {
       this.biologicalAttributes = biologicalAttributes == null ? new ArrayList<>(0) : new ArrayList<>(biologicalAttributes);
       return this;
     }
 
+    /**
+     *
+     * @param taxonomicDatasets
+     * @return
+     */
     public Builder withTaxonomicDatasets(List<TaxonomicDataset> taxonomicDatasets) {
       this.taxonomicDatasets = taxonomicDatasets == null ? new ArrayList<>(0) : new ArrayList<>(taxonomicDatasets);
       return this;
     }
 
+    /**
+     *
+     * @param depths
+     * @return
+     */
     public Builder withDepths(List<Depth> depths) {
       this.depths = depths == null ? new ArrayList<>(0) : new ArrayList<>(depths);
       return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public Cast build() {
       return new Cast(
           dataset,

@@ -91,7 +91,132 @@ root
  |    |    |    |    |-- originatorsFlag: integer (nullable = false)
 ```
 
-TODO
+### root (cast)
+
+A set of profiles (or a single profile) taken concurrently.
+
+#### dataset: string (nullable = false)
+A three-character code representing a data collection from similar instruments with similar resolution.
+
+Common Values (see WOD documentation for updates)
+* OSD - Ocean Station Data, Low-resolution CTD/XCTD, Plankton data
+* CTD - High-resolution Conductivity-Temperature-Depth / XCTD data
+* MBT - Mechanical / Digital / Micro Bathythermograph data
+* XBT - Expendable Bathythermograph data
+* SUR - Surface-only data
+* APB - Autonomous Pinniped data
+* MRB - Moored buoy data
+* PFL - Profiling float data
+* DRB - Drifting buoy data
+* UOR - Undulating Oceanographic Recorder data
+* GLD - Glider data
+
+
+#### castNumber: integer (nullable = false)
+Each cast in the WOD18 is assigned a unique cast number.
+
+
+#### country: string (nullable = false)
+A two-character code assigned to each country. Each code is unique to a country and is assigned by NCEI.
+
+Common Values (see WOD documentation for updates)
+* DE GERMANY
+* DU EAST GERMANY
+* AR ARGENTINA
+* AU AUSTRALIA
+* AT AUSTRIA
+* BE BELGIUM
+* BR BRAZIL
+* BG BULGARIA
+* CA CANADA
+* CL CHILE
+* TW TAIWAN
+* CO COLOMBIA
+* KR KOREA; REPUBLIC OF
+* DK DENMARK
+* EG EGYPT
+* EC ECUADOR
+* ES SPAIN
+* US UNITED STATES
+* FI FINLAND
+* FR FRANCE
+* GR GREECE
+* IN INDIA
+* ID INDONESIA
+* IE IRELAND
+* IS ICELAND
+* IL ISRAEL
+* IT ITALY
+* JP JAPAN
+* LB LEBANON
+* LR LIBERIA
+* MG MADAGASCAR
+* MA MOROCCO
+* MX MEXICO
+* NO NORWAY
+* NC NEW CALEDONIA
+* NZ NEW ZEALAND
+* PK PAKISTAN
+* NL NETHERLANDS
+* PE PERU
+* PH PHILIPPINES
+* PL POLAND
+* PT PORTUGAL
+* RO ROMANIA
+* GB GREAT BRITAIN
+* CN CHINA
+* SE SWEDEN
+* TH THAILAND
+* TN TUNISIA
+* TR TURKEY
+* SU SOVIET UNION
+* ZA SOUTH AFRICA
+* UY URUGUAY
+* VE VENEZUELA
+* YU YUGOSLAVIA
+* 99 UNKNOWN
+* AG ANTIGUA
+* DZ ALGERIA
+* AO ANGOLA
+* BB BARBADOS
+* BS BAHAMAS
+* CR COSTA RICA
+* CU CUBA
+* CY CYPRUS
+* EE ESTONIA
+* FJ FIJI
+* GH GHANA
+* HN HONDURAS
+* HK HONG KONG
+* CI COTE D'IVOIRE
+* KW KUWAIT
+* LV LATVIA
+* LT LITHUANIA
+* MU MAURITIUS
+* MT MALTA
+* MC MONACO
+* MY MALAYSIA
+* MR MAURITANIA
+* NG NIGERIA
+* PA PANAMA
+* CD CONGO; THE DEMOCRATIC REPUBLIC OF THE
+* RU RUSSIAN FEDERATION
+* SA SAUDI ARABIA
+* SC SEYCHELLES
+* SN SENEGAL
+* SG SINGAPORE
+* SL SIERRA LEONE
+* VC SAINT VINCENT AND THEN GRENADINES
+* TO TONGA
+* TT TRINIDAD AND TOBAGO
+* UA UKRAINE
+* WS SAMOA; WESTERN
+* YE YEMEN
+* ZZ MISCELLANEOUS ORGANIZATION
+* MH MARSHALL ISLANDS
+* HR CROATIA
+* EU EUROPEAN UNION
+
 
 ## Java WOD Parquet Model
 
