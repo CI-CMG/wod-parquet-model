@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.DataTypes;
@@ -32,12 +33,12 @@ public class Cast implements Serializable {
         new StructField("castNumber", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("country", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("cruiseNumber", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("originatorsCruise", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("originatorsCruise", DataTypes.StringType, true, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("timestamp", DataTypes.LongType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("year", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("month", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("day", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("time", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("time", DataTypes.DoubleType, true, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("longitude", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("latitude", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("profileType", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
@@ -89,13 +90,13 @@ public class Cast implements Serializable {
   private String dataset;
   private int castNumber;
   private String country;
-  private Integer cruiseNumber;
+  private int cruiseNumber;
   private String originatorsCruise;
   private long timestamp;
   private int year;
   private int month;
   private int day;
-  private double time;
+  private Double time;
   private double longitude;
   private double latitude;
   private int profileType;
@@ -119,8 +120,8 @@ public class Cast implements Serializable {
   public Cast() {
   }
 
-  private Cast(@Nonnull String dataset, int castNumber, String country, Integer cruiseNumber, String originatorsCruise, long timestamp, int year, int month, int day, double time, double longitude, double latitude,
-      int profileType, String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
+  private Cast(@Nonnull String dataset, int castNumber, @Nullable String country, int cruiseNumber, @Nullable String originatorsCruise, long timestamp, int year, int month, int day, @Nullable Double time, double longitude, double latitude,
+      int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
       @Nonnull List<Attribute> attributes,  @Nonnull List<Attribute> biologicalAttributes,  @Nonnull List<TaxonomicDataset> taxonomicDatasets,  @Nonnull List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
@@ -318,10 +319,16 @@ public class Cast implements Serializable {
     this.country = country;
   }
 
+
   /**
-   * @return
+   * In WOD18, a cruise identifier consists of two parts, the ISO 3166-1 country code and the unique cruise number.
+   * The unique cruise number is only unique with respect to the country code. For data for which there is no way to
+   * identify a specific cruise, a cruise number of zero (0) is used.
+   *
+   * @return the unique cruise number per country code
    */
-  public Integer getCruiseNumber() {
+  @Nullable
+  public int getCruiseNumber() {
     return cruiseNumber;
   }
 
@@ -333,14 +340,19 @@ public class Cast implements Serializable {
    * @deprecated use {@link  #builder()}
    */
   @Deprecated
-  public void setCruiseNumber(Integer cruiseNumber) {
+  public void setCruiseNumber(int cruiseNumber) {
     this.cruiseNumber = cruiseNumber;
   }
 
   /**
+   * The alphanumeric cruise identification provided by the originator.
    *
-   * @return
+   * TODO
+   * If the originator’s code is purely numeric, it will be found in second header code 7.
+   *
+   * @return the alphanumeric cruise identification provided by the originator or null if not provided
    */
+  @Nullable
   public String getOriginatorsCruise() {
     return originatorsCruise;
   }
@@ -358,8 +370,13 @@ public class Cast implements Serializable {
   }
 
   /**
+   * A representative timestamp of when the cast data were recorded as the number of milliseconds from 1970/1/1 UTC.
    *
-   * @return
+   *
+   * If the day value was not recorded, this timestamp assumes the first day of the month. Likewise, if a time value
+   * was not recorded, this timestamp assumes midnight UTC.
+   *
+   * @return timestamp of when the cast data was recorded as the number of milliseconds from 1970/1/1 UTC
    */
   public long getTimestamp() {
     return timestamp;
@@ -375,8 +392,9 @@ public class Cast implements Serializable {
   }
 
   /**
+   * The year the cast data were recorded.
    *
-   * @return
+   * @return the year the cast data were recorded
    */
   public int getYear() {
     return year;
@@ -395,8 +413,9 @@ public class Cast implements Serializable {
   }
 
   /**
+   * The month the cast data were recorded, 1-12.
    *
-   * @return
+   * @return the month the cast data were recorded, 1-12
    */
   public int getMonth() {
     return month;
@@ -415,6 +434,11 @@ public class Cast implements Serializable {
   }
 
   /**
+   *
+   * The day the cast data were recorded, 0-31.
+   *
+   *
+   * Please note that some data have been submitted with a day of zero (0) and we have kept these in the database as such.
    *
    * @return
    */
@@ -435,10 +459,14 @@ public class Cast implements Serializable {
   }
 
   /**
+   * A floating point representation of the time the data were recorded as 24 based hours with fractional hours.
    *
-   * @return
+   * Ex.  13:30 clock time = 13.5 in this representation
+   *
+   * @return the time the data were recorded as 24 based hours with fractional hours or null if not available
    */
-  public double getTime() {
+  @Nullable
+  public Double getTime() {
     return time;
   }
 
@@ -450,13 +478,14 @@ public class Cast implements Serializable {
    * @deprecated use {@link  #builder()}
    */
   @Deprecated
-  public void setTime(double time) {
+  public void setTime(Double time) {
     this.time = time;
   }
 
   /**
+   * E / W degrees where the cast was recorded. -180.0 - 180.0
    *
-   * @return
+   * @return E / W degrees where the cast was recorded
    */
   public double getLongitude() {
     return longitude;
@@ -475,8 +504,9 @@ public class Cast implements Serializable {
   }
 
   /**
+   * N / S degrees where the cast was recorded. -90.0 - 90.0
    *
-   * @return
+   * @return N / S degrees where the cast was recorded
    */
   public double getLatitude() {
     return latitude;
@@ -786,13 +816,13 @@ public class Cast implements Serializable {
     private String dataset;
     private int castNumber;
     private String country;
-    private Integer cruiseNumber;
+    private int cruiseNumber;
     private String originatorsCruise;
     private long timestamp;
     private int year;
     private int month;
     private int day;
-    private double time;
+    private Double time;
     private double longitude;
     private double latitude;
     private int profileType;
@@ -881,7 +911,7 @@ public class Cast implements Serializable {
      * @param cruiseNumber
      * @return
      */
-    public Builder withCruiseNumber(Integer cruiseNumber) {
+    public Builder withCruiseNumber(int cruiseNumber) {
       this.cruiseNumber = cruiseNumber;
       return this;
     }
@@ -951,7 +981,7 @@ public class Cast implements Serializable {
      * @param time
      * @return
      */
-    public Builder withTime(double time) {
+    public Builder withTime(Double time) {
       this.time = time;
       return this;
     }

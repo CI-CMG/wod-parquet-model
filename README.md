@@ -40,12 +40,12 @@ root
  |-- castNumber: integer (nullable = false)
  |-- country: string (nullable = false)
  |-- cruiseNumber: integer (nullable = false)
- |-- originatorsCruise: string (nullable = false)
+ |-- originatorsCruise: string (nullable = true)
  |-- timestamp: long (nullable = false)
  |-- year: integer (nullable = false)
  |-- month: integer (nullable = false)
  |-- day: integer (nullable = false)
- |-- time: double (nullable = false)
+ |-- time: double (nullable = true)
  |-- longitude: double (nullable = false)
  |-- latitude: double (nullable = false)
  |-- profileType: integer (nullable = false)
@@ -216,6 +216,42 @@ Common Values (see WOD documentation for updates)
 * MH MARSHALL ISLANDS
 * HR CROATIA
 * EU EUROPEAN UNION
+
+#### cruiseNumber: integer (nullable = false)
+In WOD18, a cruise identifier consists of two parts, the ISO 3166-1 country code and the unique cruise number. The 
+unique cruise number is only unique with respect to the country code. For data for which there is no way to 
+identify a specific cruise, a cruise number of zero (0) is used.
+
+#### originatorsCruise: string (nullable = true)
+The alphanumeric cruise identification provided by the originator. If the originator’s code is purely numeric, it will be found in second header code 7.
+
+#### timestamp: long (nullable = false)
+A representative timestamp of when the cast data were recorded as the number of milliseconds from 1970/1/1 UTC. If the 
+day value was not recorded, this timestamp assumes the first day of the month. Likewise, if a time value
+was not recorded, this timestamp assumes midnight UTC.
+
+#### year: integer (nullable = false)
+The year the cast data were recorded.
+
+#### month: integer (nullable = false)
+The month the cast data were recorded. Allowed values are 1-12.
+
+#### day: integer (nullable = false)
+The day the cast data were recorded. Please note that some data have been submitted with a day of zero (0) and we have 
+kept these in the database as such.  Allowed values are 0-31.
+
+#### time: double (nullable = true)
+A floating point representation of the time the data were recorded as 24 based hours with fractional hours.
+
+Ex.  13:30 clock time = 13.5 in this representation
+
+#### longitude: double (nullable = false)
+E / W degrees where the cast was recorded. Allowed values are -180.0 - 180.0.
+
+#### latitude: double (nullable = false)
+N / S degrees where the cast was recorded. Allowed values are -90.0 - 90.0.
+
+TODO
 
 
 ## Java WOD Parquet Model
