@@ -251,6 +251,20 @@ E / W degrees where the cast was recorded. Allowed values are -180.0 - 180.0.
 #### latitude: double (nullable = false)
 N / S degrees where the cast was recorded. Allowed values are -90.0 - 90.0.
 
+#### profileType: integer (nullable = false)
+A flag indicating if the cast contains profiles at the observed depths or at standard depths.
+Allowed Values:
+* 0 = Observed depths
+* 1 = Standard depths
+* * A depth below the sea surface at which water properties should be measured and reported, either directly or by
+interpolation, according to the proposal by the International Association of Physical Oceanography in 1936.
+
+#### originatorsStationCode: string (nullable = true)
+The alphanumeric station identification provided by the originator.  If the originator’s code is purely numeric, it will be found in second header code 7.
+
+#### geohash: string (nullable = false)
+A three-character [geohash](href="https://en.wikipedia.org/wiki/Geohash) derived from the cast's longitude and latitude.  This can be used to spatially group casts.
+
 TODO
 
 

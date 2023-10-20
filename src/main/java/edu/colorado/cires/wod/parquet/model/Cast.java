@@ -525,6 +525,11 @@ public class Cast implements Serializable {
   }
 
   /**
+   * A flag indicating if the cast contains profiles at the observed depths or at standard depths.
+   * Allowed Values:
+   * 0 = Observed depths
+   * 1 = Standard depths: A depth below the sea surface at which water properties should be measured and reported, either directly or by
+   * interpolation, according to the proposal by the International Association of Physical Oceanography in 1936.
    *
    * @return
    */
@@ -545,9 +550,13 @@ public class Cast implements Serializable {
   }
 
   /**
+   * The alphanumeric station identification provided by the originator.
    *
-   * @return
+   * TODO
+   * If the originator’s code is purely numeric, it will be found in second header code 7.
+   * @return the alphanumeric station identification provided by the originator or null
    */
+  @Nullable
   public String getOriginatorsStationCode() {
     return originatorsStationCode;
   }
@@ -565,8 +574,10 @@ public class Cast implements Serializable {
   }
 
   /**
+   * A three-character <a href="https://en.wikipedia.org/wiki/Geohash">geohash</a> derived from the cast's longitude
+   * and latitude.  This can be used to spatially group casts.
    *
-   * @return
+   * @return a three-character geohash where this cast was recorded
    */
   @Nonnull
   public String getGeohash() {
