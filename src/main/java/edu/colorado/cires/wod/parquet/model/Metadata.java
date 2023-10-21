@@ -35,6 +35,26 @@ public class Metadata implements Serializable {
     this.value = value;
   }
 
+  /**
+   *
+   * ID1
+   * DESCRIPTION
+   * Accession number
+   * Project
+   * Scale
+   * Institution
+   * Instrument 3.2 16 Methods 3.3 17 Originator’s units     3.4 18 Equilibrator type     3.5 19
+   * App2 ID1
+   * DESCRIPTION App2
+   * Filter type and size 3.6 Incubation time 3.7 CO2 sea warming
+   * Analysis temperature
+   * Uncalibrated
+   * Contains nitrite
+   * Normal Standard Seawater batch Adjustment
+   *
+   *
+   * @return
+   */
   public int getCode() {
     return code;
   }

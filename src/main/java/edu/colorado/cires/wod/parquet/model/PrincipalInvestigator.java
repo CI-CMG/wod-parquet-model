@@ -8,49 +8,55 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
+/**
+ * lead scientists or engineers for a particular research cruise or project
+ *
+ *
+ * The Principal Investigator (PI) is also identified by numeric code and by variable code. The PI is the person (or persons), responsible for data collection and this information is included whenever available. A list of the numeric codes associated with each PI can be found in the file: primary_investigator_list.pdf. For the purpose of assigning PI codes, plankton data are identified as variable 14 for all plankton, -5002 for zooplankton, and -5006 for phytoplankton.
+ */
 public class PrincipalInvestigator implements Serializable {
   private static final long serialVersionUID = 0L;
 
   public static StructType structType() {
     return new StructType(new StructField[]{
-        new StructField("variable", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
-        new StructField("code", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty())
+        new StructField("variableCode", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("piCode", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty())
     });
   }
 
   public Row asRow() {
-    return new GenericRowWithSchema(new Object[]{variable, code}, structType());
+    return new GenericRowWithSchema(new Object[]{variableCode, piCode}, structType());
   }
 
-  private int variable;
-  private int code;
+  private int variableCode;
+  private int piCode;
 
   @Deprecated
   public PrincipalInvestigator() {
   }
 
-  private PrincipalInvestigator(int variable, int code) {
-    this.variable = variable;
-    this.code = code;
+  private PrincipalInvestigator(int variableCode, int piCode) {
+    this.variableCode = variableCode;
+    this.piCode = piCode;
   }
 
 
-  public int getVariable() {
-    return variable;
-  }
-
-  @Deprecated
-  public void setVariable(int variable) {
-    this.variable = variable;
-  }
-
-  public int getCode() {
-    return code;
+  public int getVariableCode() {
+    return variableCode;
   }
 
   @Deprecated
-  public void setCode(int code) {
-    this.code = code;
+  public void setVariableCode(int variableCode) {
+    this.variableCode = variableCode;
+  }
+
+  public int getPiCode() {
+    return piCode;
+  }
+
+  @Deprecated
+  public void setPiCode(int piCode) {
+    this.piCode = piCode;
   }
 
   @Override
@@ -62,19 +68,19 @@ public class PrincipalInvestigator implements Serializable {
       return false;
     }
     PrincipalInvestigator that = (PrincipalInvestigator) o;
-    return variable == that.variable && code == that.code;
+    return variableCode == that.variableCode && piCode == that.piCode;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(variable, code);
+    return Objects.hash(variableCode, piCode);
   }
 
   @Override
   public String toString() {
     return "PrincipalInvestigator{" +
-        "variable=" + variable +
-        ", code=" + code +
+        "variableCode=" + variableCode +
+        ", piCode=" + piCode +
         '}';
   }
 
@@ -91,35 +97,35 @@ public class PrincipalInvestigator implements Serializable {
   }
 
   public static class Builder {
-    private int variable;
-    private int code;
+    private int variableCode;
+    private int piCode;
 
     private Builder() {
 
     }
 
     private Builder(PrincipalInvestigator source) {
-      variable = source.getVariable();
-      code = source.getCode();
+      variableCode = source.getVariableCode();
+      piCode = source.getPiCode();
     }
 
     private Builder(Row row) {
-      variable = row.getAs("variable");
-      code = row.getAs("code");
+      variableCode = row.getAs("variableCode");
+      piCode = row.getAs("piCode");
     }
 
-    public Builder withVariable(int variable) {
-      this.variable = variable;
+    public Builder withVariableCode(int variable) {
+      this.variableCode = variable;
       return this;
     }
 
-    public Builder withCode(int code) {
-      this.code = code;
+    public Builder withPiCode(int code) {
+      this.piCode = code;
       return this;
     }
 
     public PrincipalInvestigator build() {
-      return new PrincipalInvestigator(variable, code);
+      return new PrincipalInvestigator(variableCode, piCode);
     }
   }
 }
