@@ -72,7 +72,7 @@ root
  |    |    |-- value: double (nullable = false)
  |-- taxonomicDatasets: array (nullable = false)
  |    |-- element: struct (containsNull = false)
- |    |    |-- attributes: array (nullable = false)
+ |    |    |-- values: array (nullable = false)
  |    |    |    |-- element: struct (containsNull = false)
  |    |    |    |    |-- code: integer (nullable = false)
  |    |    |    |    |-- value: double (nullable = false)
@@ -85,7 +85,7 @@ root
  |    |    |-- originatorsFlag: integer (nullable = false)
  |    |    |-- data: array (nullable = false)
  |    |    |    |-- element: struct (containsNull = false)
- |    |    |    |    |-- variable: integer (nullable = false)
+ |    |    |    |    |-- variableCode: integer (nullable = false)
  |    |    |    |    |-- value: double (nullable = false)
  |    |    |    |    |-- qcFlag: integer (nullable = false)
  |    |    |    |    |-- originatorsFlag: integer (nullable = false)
@@ -333,8 +333,35 @@ Common Codes (see WOD documentation for updates):
 * 43 Delta Oxygen-18 \[∆18O\] in Per mille (‰)
 
 #### metadata: array (nullable = false)
+An array of elements representing variable metadata.
+See [Variable Metadata](#variable-metadata-root---variables---metadata) for details about each element.
 
-TODO
+### Variable Metadata (root -> variables -> metadata)
+These elements contain metadata information specific to each individual measured variable in the 
+profiles, such as originator’s units, scales, and methods.
+
+#### code: integer (nullable = false)
+Common Codes (see WOD documentation for updates):
+* 1 NCEI accession number: unique number assigned by NCEI to each batch of data received. Sometimes the variables for a cast are received at different times or from different sources and therefore may have different accession numbers. We have attempted to merge these casts together and kept the source information intact
+* 2 Project: identifies the research project associated with the data collection.
+* 3 Scale: The units for temperature and salinity are based on the internationally agreed referenced measurement standards (i.e. ITS Temperature Scale, Practical Salinity Scale, and pH scales). Table 3 provides the detailed list of variables and units
+* 4 Institution: identifies institution associated with the investigator who sampled the specific variable
+* 5 Instrument
+* 6 Methods
+* 8 Originator’s units
+* 10 Equilibrator type: describes the design of the instrument used for equilibrating seawater with air in preparation for measuring CO2 concentrations
+* 11 Filter type and size
+* 12 Incubation time: 25 is dawn to noon, 26 is noon to dusk; otherwise, value is in hours
+* 13 CO2 sea warming: temperature change in transporting water from the sea surface to the CO2 analysis site
+* 15 Analysis temperature: temperature of seawater at the time of CO2 analysis
+* 16 Uncalibrated: set to 1 if instrument is uncalibrated
+* 17 Contains nitrite: set to 1 if nitrate value is actually nitrate+nitrite
+* 18 Normal Standard Seawater batch: the code gives the IAPSO normal standard seawater batch number, P-Series, i.e. code 78 means normal standard seawater batch P78
+* 19 Adjustment: this is an adjustment (correction) value made to Argo profiling floats. The adjustment is a real value (i.e. decimal number) and is the mean difference between original (real-time) and adjusted (delayed-mode) profile of temperature, salinity, oxygen, or pressure for all values below 500 meters depth. If a profile has an adjustment value (even if this value is 0.0, it indicates that the profile has gone through additional quality control by the Argo project and is considered either adjusted real-time or delayed-mode data
+*
+
+#### value: double (nullable = false)
+Value of the variable metadata.
 
 ### Principal Investigator (root -> principalInvestigators)
 The Principal Investigator (PI) is also identified by numeric code and by variable code. The PI is the person (or persons), 
@@ -463,9 +490,63 @@ individual sets of unique observations, called “Taxa-Record”. Each “Taxa-R
 depth range (the upper and lower depth) of observation, the original measurements (e.g., abundance, biomass or volume),
 and all provided qualifiers (e.g., lifestage, sex, size, etc.) required to represent that plankton observation.
 
-#### attributes: array (nullable = false)
+#### values: array (nullable = false)
+An array of elements representing taxonomic dataset values.
+See [Taxonomic Dataset Value](#taxonomic-dataset-value-root---taxonomicdatasets---values) for details about each element.
 
-TODO
+### Taxonomic Dataset Value (root -> taxonomicDatasets -> values)
+The typical plankton cast, as represented in WOD18, stores taxon specific and/or biomass data in individual sets of unique observations, called
+“Taxa-Record”. Each “Taxa-Record” contains a taxonomic description, depth range (the upper and lower depth) of observation,
+the original measurements (e.g., abundance, biomass or volume), and all provided qualifiers (e.g., lifestage, sex, size, etc.)
+required to represent that plankton observation.
+
+#### code: integer (nullable = false)
+Common Codes (see WOD documentation for updates):
+* 1 - Variable number (>0 ITIS taxon code, <0 WOD taxon or group code)
+* 2 - Upper depth (meters)
+* 3 - Lower depth (meters)
+* 4 - Biomass value
+* 5 - Taxon lifestage
+* 6 - Taxon sex code
+* 7 - Taxon present
+* 8 - Taxon trophic mode
+* 9 - Taxon realm
+* 10 - Taxon count (count of taxon/UNIT)
+* 11 - Sample-specific sample volume (m^3 or ml/UNIT)
+* 12 - Taxon volume (ml or pl/UNIT)
+* 13 - Taxon wet weight (g or μg/UNIT)
+* 14 - Taxon dry weight (g or μg/UNIT)
+* 15 - Taxon ash-free weight (mg or ng/UNIT)
+* 16 - Taxon feature
+* 17 - Taxon modifier
+* 18 - Size min (mm, milli-mter)
+* 19 - Size max (mm, milli-mter)
+* 20 - Originator’s Unit
+* 21 - Taxon radius (μm, micro-meter)
+* 22 - Taxon length (μm, micro-meter)
+* 23 - Taxon width (μm, micro-meter)
+* 25 - Taxon carbon content (mg or ng/UNIT)
+* 26 - Count method
+* 27 - Common Base-unit Value (CBV)
+* 28 - CBV calculation method
+* 30 - Plankton Grouping Code (PGC)
+
+
+#### value: double (nullable = false)
+The value for the specified code.
+
+#### qcFlag: integer (nullable = false)
+Biological data flags (applied only to Comparable Biological Value - CBV Taxa code 27) 
+* 0 - accepted value
+* 1 - range outlier ( outside of broad range check )
+* 2 - questionable value (“bullseye flag” )
+* 3 - group was not reviewed
+* 4 - failed annual standard deviation check
+
+
+#### originatorsFlag: integer (nullable = false)
+The error flag specified by the originator.
+
 
 ### Depth (root -> depths)
 A container for all profile data at a given depth.
@@ -483,8 +564,49 @@ Common Values (see WOD documentation for updates):
 Error flag set by the originator.
 
 #### data: array (nullable = false)
+An array of elements representing variable values for the given depth.
+See [Profile Data](#profile-data-root---depths---data) for details about each element.
 
-TODO
+
+### Profile Data (root -> depths -> data)
+Contains values for variables at a given depth.
+
+#### variableCode: integer (nullable = false)
+A [Depth Variable Code](#code-integer-nullable--false)
+
+#### value: double (nullable = false)
+The value of the variable.
+
+#### qcFlag: integer (nullable = false)
+This value is different for standard levels and observed levels.
+
+Common Observed Level Flags (see WOD documentation for updates):
+* 0 - accepted value
+* 1 - range outlier ( outside of broad range check )
+* 2 - failed inversion check
+* 3 - failed gradient check
+* 4 - observed level “bullseye” flag and zero gradient check
+* 5 - combined gradient and inversion checks
+* 6 - failed range and inversion checks
+* 7 - failed range and gradient checks
+* 8 - failed range and questionable data checks
+* 9 - failed range and combined gradient and inversion checks
+
+Common Standard Level Flags (see WOD documentation for updates):
+* 0 - accepted value
+* 1 - bullseye marker
+* 2 - density inversion
+* 3 - failed annual standard deviation check
+* 4 - failed seasonal standard deviation check
+* 5 - failed monthly standard deviation check
+* 6 - failed annual and seasonal standard deviation check
+* 7 - failed annual and monthly standard deviation check
+* 8 - failed seasonal and monthly standard deviation check
+* 9 - failed annual, seasonal and monthly standard deviation check
+
+#### originatorsFlag: integer (nullable = false)
+Error flag specified by the originator.
+
 
 
 ## Java WOD Parquet Model
@@ -504,7 +626,7 @@ Add the following dependency to your Maven pom.xml
     <dependency>
       <groupId>io.github.ci-cmg.wod</groupId>
       <artifactId>wod-parquet-model</artifactId>
-      <version>0.0.1</version>
+      <version>0.0.0</version>
     </dependency>
 ```
 

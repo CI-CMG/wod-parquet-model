@@ -14,7 +14,7 @@ public class ProfileData implements Serializable {
 
   public static StructType structType() {
     return new StructType(new StructField[]{
-        new StructField("variable", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("variableCode", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("value", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("qcFlag", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("originatorsFlag", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
@@ -22,10 +22,10 @@ public class ProfileData implements Serializable {
   }
 
   public Row asRow() {
-    return new GenericRowWithSchema(new Object[]{variable, value, qcFlag, originatorsFlag}, structType());
+    return new GenericRowWithSchema(new Object[]{variableCode, value, qcFlag, originatorsFlag}, structType());
   }
 
-  private int variable;
+  private int variableCode;
   private double value;
   private int qcFlag;
   private int originatorsFlag;
@@ -47,20 +47,20 @@ public class ProfileData implements Serializable {
 
   }
 
-  private ProfileData(int variable, double value, int qcFlag, int originatorsFlag) {
-    this.variable = variable;
+  private ProfileData(int variableCode, double value, int qcFlag, int originatorsFlag) {
+    this.variableCode = variableCode;
     this.value = value;
     this.qcFlag = qcFlag;
     this.originatorsFlag = originatorsFlag;
   }
 
-  public int getVariable() {
-    return variable;
+  public int getVariableCode() {
+    return variableCode;
   }
 
   @Deprecated
-  public void setVariable(int variable) {
-    this.variable = variable;
+  public void setVariableCode(int variableCode) {
+    this.variableCode = variableCode;
   }
 
   public double getValue() {
@@ -99,19 +99,19 @@ public class ProfileData implements Serializable {
       return false;
     }
     ProfileData that = (ProfileData) o;
-    return variable == that.variable && Double.compare(that.value, value) == 0 && qcFlag == that.qcFlag
+    return variableCode == that.variableCode && Double.compare(that.value, value) == 0 && qcFlag == that.qcFlag
         && originatorsFlag == that.originatorsFlag;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(variable, value, qcFlag, originatorsFlag);
+    return Objects.hash(variableCode, value, qcFlag, originatorsFlag);
   }
 
   @Override
   public String toString() {
     return "ProfileData{" +
-        "variable=" + variable +
+        "variableCode=" + variableCode +
         ", value=" + value +
         ", qcFlag=" + qcFlag +
         ", originatorsFlag=" + originatorsFlag +
@@ -120,7 +120,7 @@ public class ProfileData implements Serializable {
 
   public static class Builder {
 
-    private int variable;
+    private int variableCode;
     private double value;
     private int qcFlag;
     private int originatorsFlag;
@@ -130,21 +130,21 @@ public class ProfileData implements Serializable {
     }
 
     private Builder(ProfileData source) {
-      variable = source.getVariable();
+      variableCode = source.getVariableCode();
       value = source.getValue();
       qcFlag = source.getQcFlag();
       originatorsFlag = source.getOriginatorsFlag();
     }
 
     private Builder(Row row) {
-      variable = row.getAs("variable");
+      variableCode = row.getAs("variableCode");
       value = row.getAs("value");
       qcFlag = row.getAs("qcFlag");
       originatorsFlag = row.getAs("originatorsFlag");
     }
 
-    public Builder withVariable(int variable) {
-      this.variable = variable;
+    public Builder withVariableCode(int variableCode) {
+      this.variableCode = variableCode;
       return this;
     }
 
@@ -164,7 +164,7 @@ public class ProfileData implements Serializable {
     }
 
     public ProfileData build() {
-      return new ProfileData(variable, value, qcFlag, originatorsFlag);
+      return new ProfileData(variableCode, value, qcFlag, originatorsFlag);
     }
   }
 }

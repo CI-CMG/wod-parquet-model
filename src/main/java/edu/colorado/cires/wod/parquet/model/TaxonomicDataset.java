@@ -17,32 +17,32 @@ public class TaxonomicDataset implements Serializable {
 
   public static StructType structType() {
     return new StructType(new StructField[]{
-        new StructField("attributes", DataTypes.createArrayType(QcAttribute.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("values", DataTypes.createArrayType(QcAttribute.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
     });
   }
 
   public Row asRow() {
-    return new GenericRowWithSchema(new Object[]{attributes}, structType());
+    return new GenericRowWithSchema(new Object[]{values}, structType());
   }
 
-  private List<QcAttribute> attributes;
+  private List<QcAttribute> values;
 
   @Deprecated
   public TaxonomicDataset() {
   }
 
-  private TaxonomicDataset(List<QcAttribute> attributes) {
-    this.attributes = Collections.unmodifiableList(attributes);
+  private TaxonomicDataset(List<QcAttribute> values) {
+    this.values = Collections.unmodifiableList(values);
   }
 
   @Nonnull
-  public List<QcAttribute> getAttributes() {
-    return attributes;
+  public List<QcAttribute> getValues() {
+    return values;
   }
 
   @Deprecated
-  public void setAttributes(List<QcAttribute> attributes) {
-    this.attributes = attributes == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(attributes));
+  public void setValues(List<QcAttribute> values) {
+    this.values = values == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(values));
   }
 
   @Override
@@ -54,18 +54,18 @@ public class TaxonomicDataset implements Serializable {
       return false;
     }
     TaxonomicDataset that = (TaxonomicDataset) o;
-    return Objects.equals(attributes, that.attributes);
+    return Objects.equals(values, that.values);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(attributes);
+    return Objects.hash(values);
   }
 
   @Override
   public String toString() {
     return "TaxonomicDataset{" +
-        "attributes=" + attributes +
+        "values=" + values +
         '}';
   }
 
@@ -82,27 +82,27 @@ public class TaxonomicDataset implements Serializable {
   }
 
   public static class Builder {
-    private List<QcAttribute> attributes = new ArrayList<>(0);
+    private List<QcAttribute> values = new ArrayList<>(0);
 
     private Builder() {
 
     }
 
     private Builder(TaxonomicDataset orig) {
-      attributes = orig.getAttributes();
+      values = orig.getValues();
     }
 
     private Builder(Row row) {
-      attributes = RowUtils.getAs(row, "attributes",  r -> QcAttribute.builder(r).build());
+      values = RowUtils.getAs(row, "values",  r -> QcAttribute.builder(r).build());
     }
 
-    public Builder withAttributes(List<QcAttribute> attributes) {
-      this.attributes = attributes == null ? new ArrayList<>(0) : new ArrayList<>(attributes);
+    public Builder withValues(List<QcAttribute> values) {
+      this.values = values == null ? new ArrayList<>(0) : new ArrayList<>(values);
       return this;
     }
 
     public TaxonomicDataset build() {
-      return new TaxonomicDataset(attributes);
+      return new TaxonomicDataset(values);
     }
   }
 }
