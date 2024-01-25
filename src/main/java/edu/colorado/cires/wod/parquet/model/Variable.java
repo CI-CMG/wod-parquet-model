@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
@@ -30,7 +31,10 @@ public class Variable implements Serializable {
   }
 
   public Row asRow() {
-    return new GenericRowWithSchema(new Object[]{code, metadata}, structType());
+    return new GenericRowWithSchema(new Object[]{
+        code,
+        metadata.stream().map(Metadata::asRow).collect(Collectors.toList())
+    }, structType());
   }
 
   private int code;

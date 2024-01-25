@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.spark.sql.Row;
@@ -77,12 +78,12 @@ public class Cast implements Serializable {
         profileType,
         originatorsStationCode,
         geohash,
-        variables,
-        principalInvestigators,
-        attributes,
-        biologicalAttributes,
-        taxonomicDatasets,
-        depths,
+        variables.stream().map(Variable::asRow).collect(Collectors.toList()),
+        principalInvestigators.stream().map(PrincipalInvestigator::asRow).collect(Collectors.toList()),
+        attributes.stream().map(Attribute::asRow).collect(Collectors.toList()),
+        biologicalAttributes.stream().map(Attribute::asRow).collect(Collectors.toList()),
+        taxonomicDatasets.stream().map(TaxonomicDataset::asRow).collect(Collectors.toList()),
+        depths.stream().map(Depth::asRow).collect(Collectors.toList()),
     }, structType());
   }
 
