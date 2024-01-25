@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
@@ -22,7 +23,9 @@ public class TaxonomicDataset implements Serializable {
   }
 
   public Row asRow() {
-    return new GenericRowWithSchema(new Object[]{values}, structType());
+    return new GenericRowWithSchema(new Object[]{
+        values.stream().map(QcAttribute::asRow).collect(Collectors.toList())
+    }, structType());
   }
 
   private List<QcAttribute> values;

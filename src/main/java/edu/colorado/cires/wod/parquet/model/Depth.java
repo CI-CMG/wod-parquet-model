@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
@@ -26,7 +27,12 @@ public class Depth implements Serializable {
   }
 
   public Row asRow() {
-    return new GenericRowWithSchema(new Object[]{depth, depthErrorFlag, originatorsFlag, data}, structType());
+    return new GenericRowWithSchema(new Object[]{
+        depth,
+        depthErrorFlag,
+        originatorsFlag,
+        data.stream().map(ProfileData::asRow).collect(Collectors.toList())
+    }, structType());
   }
 
   private double depth;
