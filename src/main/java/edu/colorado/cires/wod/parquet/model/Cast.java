@@ -1,5 +1,6 @@
 package edu.colorado.cires.wod.parquet.model;
 
+import com.github.davidmoten.geo.GeoHash;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +11,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
+import org.apache.spark.sql.sedona_sql.UDT.GeometryUDT;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 
 
 /**
@@ -22,6 +28,8 @@ import org.apache.spark.sql.types.StructType;
 public class Cast implements Serializable {
 
   private static final long serialVersionUID = 0L;
+  private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(), 4326);
+  private static final int GEOHASH_LENGTH = 9;
 
   /**
    * Returns an Apache Spark {@link StructType} representing the root of the WOD Parquet schema.
@@ -42,6 +50,7 @@ public class Cast implements Serializable {
         new StructField("time", DataTypes.DoubleType, true, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("longitude", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("latitude", DataTypes.DoubleType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("location", new GeometryUDT(), false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("profileType", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("originatorsStationCode", DataTypes.StringType, true, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("geohash", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
@@ -75,6 +84,7 @@ public class Cast implements Serializable {
         time,
         longitude,
         latitude,
+        location,
         profileType,
         originatorsStationCode,
         geohash,
@@ -100,6 +110,7 @@ public class Cast implements Serializable {
   private Double time;
   private double longitude;
   private double latitude;
+  private Geometry location;
   private int profileType;
   private String originatorsStationCode;
   private String geohash;
@@ -122,7 +133,7 @@ public class Cast implements Serializable {
   }
 
   private Cast(@Nonnull String dataset, int castNumber, @Nullable String country, int cruiseNumber, @Nullable String originatorsCruise, long timestamp, int year, int month, int day, @Nullable Double time, double longitude, double latitude,
-      int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
+      Geometry location, int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
       @Nonnull List<Attribute> attributes,  @Nonnull List<Attribute> biologicalAttributes,  @Nonnull List<TaxonomicDataset> taxonomicDatasets,  @Nonnull List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
@@ -136,6 +147,7 @@ public class Cast implements Serializable {
     this.time = time;
     this.longitude = longitude;
     this.latitude = latitude;
+    this.location = location;
     this.profileType = profileType;
     this.originatorsStationCode = originatorsStationCode;
     this.geohash = geohash;
@@ -523,6 +535,15 @@ public class Cast implements Serializable {
     this.latitude = latitude;
   }
 
+  public Geometry getLocation() {
+    return location;
+  }
+
+  @Deprecated
+  public void setLocation(Geometry location) {
+    this.location = location;
+  }
+
   /**
    * A flag indicating if the cast contains profiles at the observed depths or at standard depths.
    * Allowed Values:
@@ -872,21 +893,23 @@ public class Cast implements Serializable {
       return false;
     }
     Cast cast = (Cast) o;
-    return castNumber == cast.castNumber && timestamp == cast.timestamp && year == cast.year && month == cast.month && day == cast.day
-        && Double.compare(cast.time, time) == 0 && Double.compare(cast.longitude, longitude) == 0
-        && Double.compare(cast.latitude, latitude) == 0 && profileType == cast.profileType && Objects.equals(dataset, cast.dataset)
-        && Objects.equals(cruiseNumber, cast.cruiseNumber) && Objects.equals(originatorsCruise, cast.originatorsCruise)
-        && Objects.equals(originatorsStationCode, cast.originatorsStationCode) && Objects.equals(geohash, cast.geohash)
-        && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators, cast.principalInvestigators)
-        && Objects.equals(attributes, cast.attributes) && Objects.equals(biologicalAttributes, cast.biologicalAttributes)
-        && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths, cast.depths)
-        && Objects.equals(country, cast.country);
+    return castNumber == cast.castNumber && cruiseNumber == cast.cruiseNumber && timestamp == cast.timestamp && year == cast.year
+        && month == cast.month
+        && day == cast.day && Double.compare(cast.longitude, longitude) == 0 && Double.compare(cast.latitude, latitude) == 0
+        && profileType == cast.profileType && Objects.equals(dataset, cast.dataset) && Objects.equals(country, cast.country)
+        && Objects.equals(originatorsCruise, cast.originatorsCruise) && Objects.equals(time, cast.time) && Objects.equals(
+        location, cast.location) && Objects.equals(originatorsStationCode, cast.originatorsStationCode) && Objects.equals(geohash,
+        cast.geohash) && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators,
+        cast.principalInvestigators) && Objects.equals(attributes, cast.attributes) && Objects.equals(biologicalAttributes,
+        cast.biologicalAttributes) && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths,
+        cast.depths);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(dataset, castNumber, country, cruiseNumber, originatorsCruise, timestamp, year, month, day, time, longitude, latitude, profileType,
-        originatorsStationCode, geohash, variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
+    return Objects.hash(dataset, castNumber, country, cruiseNumber, originatorsCruise, timestamp, year, month, day, time, longitude, latitude,
+        location,
+        profileType, originatorsStationCode, geohash, variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
   }
 
   @Override
@@ -904,6 +927,7 @@ public class Cast implements Serializable {
         ", time=" + time +
         ", longitude=" + longitude +
         ", latitude=" + latitude +
+        ", location=" + location +
         ", profileType=" + profileType +
         ", originatorsStationCode='" + originatorsStationCode + '\'' +
         ", geohash='" + geohash + '\'' +
@@ -948,20 +972,20 @@ public class Cast implements Serializable {
   public static class Builder {
 
     private String dataset;
-    private int castNumber;
+    private Integer castNumber;
     private String country;
-    private int cruiseNumber;
+    private Integer cruiseNumber;
     private String originatorsCruise;
-    private long timestamp;
-    private int year;
-    private int month;
-    private int day;
+    private Long timestamp;
+    private Integer year;
+    private Integer month;
+    private Integer day;
     private Double time;
-    private double longitude;
-    private double latitude;
-    private int profileType;
+    private Double longitude;
+    private Double latitude;
+    private Geometry location;
+    private Integer profileType;
     private String originatorsStationCode;
-    private String geohash;
     private List<Variable> variables = new ArrayList<>(0);
     private List<PrincipalInvestigator> principalInvestigators = new ArrayList<>(0);
     private List<Attribute> attributes = new ArrayList<>(0);
@@ -983,11 +1007,9 @@ public class Cast implements Serializable {
       month = source.getMonth();
       day = source.getDay();
       time = source.getTime();
-      longitude = source.getLongitude();
-      latitude = source.getLatitude();
+      location = source.getLocation();
       profileType = source.getProfileType();
       originatorsStationCode = source.getOriginatorsStationCode();
-      geohash = source.getGeohash();
       variables = source.getVariables();
       principalInvestigators = source.getPrincipalInvestigators();
       attributes = source.getAttributes();
@@ -1007,11 +1029,9 @@ public class Cast implements Serializable {
       month = row.getAs("month");
       day = row.getAs("day");
       time = row.getAs("time");
-      longitude = row.getAs("longitude");
-      latitude = row.getAs("latitude");
+      location = row.getAs("location");
       profileType = row.getAs("profileType");
       originatorsStationCode = row.getAs("originatorsStationCode");
-      geohash = row.getAs("geohash");
       variables = RowUtils.getAs(row, "variables", r -> Variable.builder(r).build());
       principalInvestigators = RowUtils.getAs(row, "principalInvestigators", r -> PrincipalInvestigator.builder(r).build());
       attributes = RowUtils.getAs(row, "attributes", r -> Attribute.builder(r).build());
@@ -1162,16 +1182,6 @@ public class Cast implements Serializable {
 
     /**
      *
-     * @param geohash
-     * @return
-     */
-    public Builder withGeohash(String geohash) {
-      this.geohash = geohash;
-      return this;
-    }
-
-    /**
-     *
      * @param variables
      * @return
      */
@@ -1235,22 +1245,36 @@ public class Cast implements Serializable {
      * @return
      */
     public Cast build() {
+      double resolvedLongitude;
+      double resolvedLatitude;
+      Geometry point;
+      if (location != null) {
+        point = location;
+        resolvedLongitude = location.getCoordinate().getX();
+        resolvedLatitude = location.getCoordinate().getY();
+      } else {
+        point = GEOMETRY_FACTORY.createPoint(new Coordinate(Objects.requireNonNull(longitude, "longitude is required"), Objects.requireNonNull(latitude, "latitude is required")));
+        resolvedLongitude = longitude;
+        resolvedLatitude = latitude;
+      }
+
       return new Cast(
           dataset,
-          castNumber,
+          Objects.requireNonNull(castNumber, "castNumber is required"),
           country,
-          cruiseNumber,
+          Objects.requireNonNull(cruiseNumber, "cruiseNumber is required"),
           originatorsCruise,
           timestamp,
-          year,
-          month,
+          Objects.requireNonNull(year, "year is required"),
+          Objects.requireNonNull(month, "month is required"),
           day,
           time,
-          longitude,
-          latitude,
-          profileType,
+          resolvedLongitude,
+          resolvedLatitude,
+          point,
+          Objects.requireNonNull(profileType, "profileType is required"),
           originatorsStationCode,
-          geohash,
+          GeoHash.encodeHash(resolvedLatitude, resolvedLongitude, GEOHASH_LENGTH),
           variables,
           principalInvestigators,
           attributes,
