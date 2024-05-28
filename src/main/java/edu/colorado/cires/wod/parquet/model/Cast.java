@@ -2,8 +2,12 @@ package edu.colorado.cires.wod.parquet.model;
 
 import com.github.davidmoten.geo.GeoHash;
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,6 +23,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 
 /**
@@ -71,6 +77,7 @@ public class Cast implements Serializable {
    * @return this class represented as a generic Spark {@link Row}
    */
   public Row asRow() {
+    variables.stream().map(Variable::asRow).collect(Collectors.toList());
     return new GenericRowWithSchema(new Object[]{
         dataset,
         castNumber,
@@ -88,13 +95,20 @@ public class Cast implements Serializable {
         profileType,
         originatorsStationCode,
         geohash,
-        variables.stream().map(Variable::asRow).collect(Collectors.toList()),
-        principalInvestigators.stream().map(PrincipalInvestigator::asRow).collect(Collectors.toList()),
-        attributes.stream().map(Attribute::asRow).collect(Collectors.toList()),
-        biologicalAttributes.stream().map(Attribute::asRow).collect(Collectors.toList()),
-        taxonomicDatasets.stream().map(TaxonomicDataset::asRow).collect(Collectors.toList()),
-        depths.stream().map(Depth::asRow).collect(Collectors.toList()),
+        listToSeq(variables.stream().map(Variable::asRow).iterator()),
+        listToSeq(principalInvestigators.stream().map(PrincipalInvestigator::asRow).iterator()),
+        listToSeq(attributes.stream().map(Attribute::asRow).iterator()),
+        listToSeq(biologicalAttributes.stream().map(Attribute::asRow).iterator()),
+        listToSeq(taxonomicDatasets.stream().map(TaxonomicDataset::asRow).iterator()),
+        listToSeq(depths.stream().map(Depth::asRow).iterator()),
     }, structType());
+  }
+
+  private static <A> Seq<A> listToSeq(Iterator<A> iterator) {
+    if (iterator == null) {
+      return null;
+    }
+    return JavaConverters.asScalaIteratorConverter(iterator).asScala().toSeq();
   }
 
 
@@ -1258,17 +1272,71 @@ public class Cast implements Serializable {
         resolvedLatitude = latitude;
       }
 
+      if(resolvedLongitude < -180D || resolvedLongitude > 180D) {
+        throw new IllegalArgumentException("longitude must be between -180 and 180");
+      }
+
+      if(resolvedLatitude < -90D || resolvedLatitude > 90D) {
+        throw new IllegalArgumentException("latitude must be between -90 and 90");
+      }
+
+      long resolvedTimestamp;
+      int resolvedYear;
+      int resolvedMonth;
+      int resolvedDay;
+      Double resolvedTime;
+      if (timestamp != null) {
+        resolvedTimestamp = timestamp;
+        Instant instant = Instant.ofEpochMilli(timestamp);
+        LocalDateTime date = instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
+        resolvedYear = date.getYear();
+        resolvedMonth = date.getMonthValue();
+        resolvedDay = date.getDayOfMonth();
+        if ( date.getHour() == 0 && date.getMinute() == 0 && date.getSecond() == 0 && date.getNano() == 0 ) {
+          resolvedTime = time; // this will either be null or zero
+        } else {
+          // 10:33:19.8
+          double minutes = ((double) date.getMinute()) / 60D; // 0.55
+          double second = ((double) date.getSecond()) + (((double) date.getNano()) / 1000000000D); // 19.8
+          double seconds = second / 3600D; // 0.0055
+          resolvedTime = (double) date.getHour() + minutes + seconds; // 10.5555
+        }
+      } else {
+        resolvedYear = Objects.requireNonNull(year, "year or timestamp is required");
+        resolvedMonth = Objects.requireNonNull(month, "month or timestamp is required");
+        resolvedDay = Objects.requireNonNull(day, "day or timestamp is required");
+        if (resolvedDay == 0) {
+          resolvedDay = 1;
+        }
+        resolvedTime = time;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        int nano = 0;
+        if (time != null) { // 10.5555
+          hour = time.intValue(); // 10
+          double fractionalMinutes = time - ((double) hour); // 0.5555
+          double minutes = fractionalMinutes * 60D; // 33.33
+          minute = (int)(minutes); // 33
+          double seconds = (minutes - minute ) * 60D; // 19.8
+          second = (int) seconds; // 19
+          nano = (int) ((seconds - second) * 1000000000D); // 800000000
+        }
+        LocalDateTime date = LocalDateTime.of(resolvedYear, resolvedMonth, resolvedDay, hour, minute, second, nano);
+        resolvedTimestamp = date.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
+      }
+
       return new Cast(
           dataset,
           Objects.requireNonNull(castNumber, "castNumber is required"),
           country,
           Objects.requireNonNull(cruiseNumber, "cruiseNumber is required"),
           originatorsCruise,
-          timestamp,
-          Objects.requireNonNull(year, "year is required"),
-          Objects.requireNonNull(month, "month is required"),
-          day,
-          time,
+          resolvedTimestamp,
+          resolvedYear,
+          resolvedMonth,
+          resolvedDay,
+          resolvedTime,
           resolvedLongitude,
           resolvedLatitude,
           point,
