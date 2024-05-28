@@ -77,7 +77,6 @@ public class Cast implements Serializable {
    * @return this class represented as a generic Spark {@link Row}
    */
   public Row asRow() {
-    variables.stream().map(Variable::asRow).collect(Collectors.toList());
     return new GenericRowWithSchema(new Object[]{
         dataset,
         castNumber,
@@ -147,7 +146,7 @@ public class Cast implements Serializable {
   }
 
   private Cast(@Nonnull String dataset, int castNumber, @Nullable String country, int cruiseNumber, @Nullable String originatorsCruise, long timestamp, int year, int month, int day, @Nullable Double time, double longitude, double latitude,
-      Geometry location, int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
+      @Nonnull Geometry location, int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
       @Nonnull List<Attribute> attributes,  @Nonnull List<Attribute> biologicalAttributes,  @Nonnull List<TaxonomicDataset> taxonomicDatasets,  @Nonnull List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
