@@ -62,6 +62,7 @@ public class CastTest {
         .build();
 
     assertEquals("hgbvhkypr", cast.getGeohash());
+    assertEquals("hgb", cast.getGeohash3());
 
     Cast cast2 = Cast.builder(cast).build();
 

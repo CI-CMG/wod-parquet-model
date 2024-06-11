@@ -60,6 +60,7 @@ public class Cast implements Serializable {
         new StructField("profileType", DataTypes.IntegerType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("originatorsStationCode", DataTypes.StringType, true, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("geohash", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
+        new StructField("geohash3", DataTypes.StringType, false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("variables", DataTypes.createArrayType(Variable.structType(), false), false, org.apache.spark.sql.types.Metadata.empty()),
         new StructField("principalInvestigators", DataTypes.createArrayType(PrincipalInvestigator.structType(), false), false,
             org.apache.spark.sql.types.Metadata.empty()),
@@ -94,6 +95,7 @@ public class Cast implements Serializable {
         profileType,
         originatorsStationCode,
         geohash,
+        geohash3,
         listToSeq(variables.stream().map(Variable::asRow).iterator()),
         listToSeq(principalInvestigators.stream().map(PrincipalInvestigator::asRow).iterator()),
         listToSeq(attributes.stream().map(Attribute::asRow).iterator()),
@@ -127,6 +129,7 @@ public class Cast implements Serializable {
   private int profileType;
   private String originatorsStationCode;
   private String geohash;
+  private String geohash3;
   private List<Variable> variables;
   private List<PrincipalInvestigator> principalInvestigators;
   private List<Attribute> attributes;
@@ -146,7 +149,7 @@ public class Cast implements Serializable {
   }
 
   private Cast(@Nonnull String dataset, int castNumber, @Nullable String country, int cruiseNumber, @Nullable String originatorsCruise, long timestamp, int year, int month, int day, @Nullable Double time, double longitude, double latitude,
-      @Nonnull Geometry location, int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
+      @Nonnull Geometry location, int profileType, @Nullable String originatorsStationCode,  @Nonnull String geohash, @Nonnull String geohash3,  @Nonnull List<Variable> variables,  @Nonnull List<PrincipalInvestigator> principalInvestigators,
       @Nonnull List<Attribute> attributes,  @Nonnull List<Attribute> biologicalAttributes,  @Nonnull List<TaxonomicDataset> taxonomicDatasets,  @Nonnull List<Depth> depths) {
     this.dataset = dataset;
     this.castNumber = castNumber;
@@ -164,6 +167,7 @@ public class Cast implements Serializable {
     this.profileType = profileType;
     this.originatorsStationCode = originatorsStationCode;
     this.geohash = geohash;
+    this.geohash3 = geohash3;
     this.variables = Collections.unmodifiableList(variables);
     this.principalInvestigators = Collections.unmodifiableList(principalInvestigators);
     this.attributes = Collections.unmodifiableList(attributes);
@@ -606,7 +610,7 @@ public class Cast implements Serializable {
   }
 
   /**
-   * A three-character <a href="https://en.wikipedia.org/wiki/Geohash">geohash</a> derived from the cast's longitude
+   * A nine-character <a href="https://en.wikipedia.org/wiki/Geohash">geohash</a> derived from the cast's longitude
    * and latitude.  This can be used to spatially group casts.
    *
    * @return a three-character geohash where this cast was recorded
@@ -626,6 +630,29 @@ public class Cast implements Serializable {
   @Deprecated
   public void setGeohash(String geohash) {
     this.geohash = geohash;
+  }
+
+  /**
+   * A three-character <a href="https://en.wikipedia.org/wiki/Geohash">geohash</a> derived from the cast's longitude
+   * and latitude.  This can be used to spatially group casts.
+   *
+   * @return a three-character geohash where this cast was recorded
+   */
+  @Nonnull
+  public String getGeohash3() {
+    return geohash3;
+  }
+
+  /**
+   * DO NOT USE
+   *
+   * This is only public in order to allow for Spark conversion.
+   *
+   * @deprecated use {@link  #builder()}
+   */
+  @Deprecated
+  public void setGeohash3(String geohash3) {
+    this.geohash3 = geohash3;
   }
 
   /**
@@ -912,7 +939,7 @@ public class Cast implements Serializable {
         && profileType == cast.profileType && Objects.equals(dataset, cast.dataset) && Objects.equals(country, cast.country)
         && Objects.equals(originatorsCruise, cast.originatorsCruise) && Objects.equals(time, cast.time) && Objects.equals(
         location, cast.location) && Objects.equals(originatorsStationCode, cast.originatorsStationCode) && Objects.equals(geohash,
-        cast.geohash) && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators,
+        cast.geohash) && Objects.equals(geohash3, geohash3) && Objects.equals(variables, cast.variables) && Objects.equals(principalInvestigators,
         cast.principalInvestigators) && Objects.equals(attributes, cast.attributes) && Objects.equals(biologicalAttributes,
         cast.biologicalAttributes) && Objects.equals(taxonomicDatasets, cast.taxonomicDatasets) && Objects.equals(depths,
         cast.depths);
@@ -922,7 +949,7 @@ public class Cast implements Serializable {
   public int hashCode() {
     return Objects.hash(dataset, castNumber, country, cruiseNumber, originatorsCruise, timestamp, year, month, day, time, longitude, latitude,
         location,
-        profileType, originatorsStationCode, geohash, variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
+        profileType, originatorsStationCode, geohash, geohash3, variables, principalInvestigators, attributes, biologicalAttributes, taxonomicDatasets, depths);
   }
 
   @Override
@@ -944,6 +971,7 @@ public class Cast implements Serializable {
         ", profileType=" + profileType +
         ", originatorsStationCode='" + originatorsStationCode + '\'' +
         ", geohash='" + geohash + '\'' +
+        ", geohash3='" + geohash3 + '\'' +
         ", variables=" + variables +
         ", principalInvestigators=" + principalInvestigators +
         ", attributes=" + attributes +
@@ -1325,6 +1353,8 @@ public class Cast implements Serializable {
         resolvedTimestamp = date.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
       }
 
+      String geohash = GeoHash.encodeHash(resolvedLatitude, resolvedLongitude, GEOHASH_LENGTH);
+
       return new Cast(
           dataset,
           Objects.requireNonNull(castNumber, "castNumber is required"),
@@ -1341,7 +1371,8 @@ public class Cast implements Serializable {
           point,
           Objects.requireNonNull(profileType, "profileType is required"),
           originatorsStationCode,
-          GeoHash.encodeHash(resolvedLatitude, resolvedLongitude, GEOHASH_LENGTH),
+          geohash,
+          geohash.substring(0, 3),
           variables,
           principalInvestigators,
           attributes,
