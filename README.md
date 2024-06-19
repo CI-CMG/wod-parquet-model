@@ -48,9 +48,11 @@ root
  |-- time: double (nullable = true)
  |-- longitude: double (nullable = false)
  |-- latitude: double (nullable = false)
+ |-- location: geometry (nullable = false)
  |-- profileType: integer (nullable = false)
  |-- originatorsStationCode: string (nullable = true)
  |-- geohash: string (nullable = false)
+ |-- geohash3: string (nullable = false)
  |-- variables: array (nullable = false)
  |    |-- element: struct (containsNull = false)
  |    |    |-- code: integer (nullable = false)
@@ -252,6 +254,9 @@ E / W degrees where the cast was recorded. Allowed values are -180.0 - 180.0.
 #### latitude: double (nullable = false)
 N / S degrees where the cast was recorded. Allowed values are -90.0 - 90.0.
 
+#### location: geometry (nullable = false)
+A GeoParquet geometry representing a point
+
 #### profileType: integer (nullable = false)
 A flag indicating if the cast contains profiles at the observed depths or at standard depths.
 Allowed Values:
@@ -264,8 +269,10 @@ interpolation, according to the proposal by the International Association of Phy
 The alphanumeric station identification provided by the originator.
 If the originator’s code is purely numeric, it will be found in the [cast attributes](#attributes-array-nullable--false) with code 7.
 
-
 #### geohash: string (nullable = false)
+A nine-character [geohash](href="https://en.wikipedia.org/wiki/Geohash) derived from the cast's longitude and latitude.  This can be used to spatially group casts.
+
+#### geohash3: string (nullable = false)
 A three-character [geohash](href="https://en.wikipedia.org/wiki/Geohash) derived from the cast's longitude and latitude.  This can be used to spatially group casts.
 
 #### variables: array (nullable = false)
