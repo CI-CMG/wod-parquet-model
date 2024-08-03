@@ -30,7 +30,7 @@
     <connection>scm:git:git@github.com:CI-CMG/wod-parquet-model.git</connection>
     <developerConnection>scm:git:git@github.com:CI-CMG/wod-parquet-model.git</developerConnection>
     <url>https://github.com/CI-CMG/wod-parquet-model</url>
-    <tag>HEAD</tag>
+    <tag>0.2</tag>
   </scm>
 
   <distributionManagement>
